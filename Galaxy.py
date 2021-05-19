@@ -3,29 +3,47 @@ import random
 import Civilization
 
 class Galaxy:
-	def __init__(self, x : int , y: int, InitCivs: int, MaxCivs=100):
+	def __init__(self, x : int , y: int, InitCivs: int, MaxCivs=100, slowStart=True):
 		self.Civilizations = []
 		self.Dead = []
-		self.Max = MaxCivs
+		self.Max = InitCivs
+		self.civsMade = 0
 		self.Xsize = x
 		self.Ysize = y
 		self.NewCiv = False
-		self.New = 0
+		self.New = []
 		self.age = 0
+		self.initializing = True
 		self.Stats = {'Wars':0, 'Cease Fires':0, 'Civilizations':0, 'Conveys':0, 'Ally Aids':0, 'Civil Wars':0}
-		for i in range(InitCivs):
-			self.Civilizations.append(Civilization.Civilization(self))
-			print(self.Civilizations[-1].transformCoord())
-			self.Stats['Civilizations'] +=1
+		if not slowStart:
+			for i in range(InitCivs):
+				self.Civilizations.append(Civilization.Civilization(self))
+				print(self.Civilizations[-1].transformCoord())
+				self.Stats['Civilizations'] +=1
+		else:
+			self.slowInit()
+
+	def slowInit(self):
+		if self.civsMade < self.Max and self.initializing:
+			for i in range(random.randint(-2,5)):
+				if self.civsMade < self.Max:
+					self.create()
+					self.civsMade +=1
+		else:
+			self.initializing = False
+
+
+	def create(self):
+		new = Civilization.Civilization(self)
+		self.New.append(new)
+		self.Civilizations.append(new)
+		self.NewCiv = True
+		self.Stats['Civilizations'] +=1
 
 	def newCiv(self):
 		self.NewCiv = False
 		if random.randint(0,100) < 1:
-			new = Civilization.Civilization(self)
-			self.New = new
-			self.Civilizations.append(new)
-			self.NewCiv = True
-			self.Stats['Civilizations'] +=1
+			self.create()
 
 	def removeCiv(self, civ):
 		# remove Civ if civilization is dead
@@ -48,7 +66,7 @@ class Galaxy:
 				i.Ally.remove(civ)
 
 	def end(self):
-		if len(self.Civilizations)<=1:
+		if len(self.Civilizations)<=1 and self.initializing is False:
 			return True
 		else:
 			return False
@@ -65,6 +83,7 @@ class Galaxy:
 			return self.Civilizations[0]
 
 	def move(self):
+		self.slowInit()
 		self.newCiv()
 		for i in self.Civilizations:
 			i.move()

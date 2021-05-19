@@ -7,7 +7,7 @@ class DarkForest(Scene):
 		'''建议X:Y=7:4'''
 		GalSizeX = 35
 		GalSizeY = 20
-		GalCivilizations = 50
+		GalCivilizations = 20
 		# reduce animation time
 		simple = True
 
@@ -35,8 +35,10 @@ class DarkForest(Scene):
 		while not self.Universe.end():
 			self.Universe.move()
 			# self.drawConvey()
-			if self.Universe.NewCiv:
-				self.addCiv()
+			
+			for i in self.Universe.New:
+				self.addCiv(i)
+			self.Universe.New = []
 			self.drawRelations()
 			self.updateAge()
 			self.checkChangeAttitude()
@@ -70,46 +72,46 @@ class DarkForest(Scene):
 		# 				print(i.Rad)
 		# 				self.conveys.append(c)
 					
-	def addCiv(self):
-		self.CivGroup[self.Universe.New] = VGroup(Dot(point=ORIGIN, radius=0.05))
+	def addCiv(self, civ):
+		self.CivGroup[civ] = VGroup(Dot(point=ORIGIN, radius=0.05))
 
-		if self.Universe.New.Attitude == 1:
-			self.CivGroup[self.Universe.New][0].set_color(GREEN)
-		elif self.Universe.New.Attitude == 2:
-			self.CivGroup[self.Universe.New][0].set_color(RED)
-		elif self.Universe.New.Attitude == 3:
-			self.CivGroup[self.Universe.New][0].set_color(YELLOW)
+		if civ.Attitude == 1:
+			self.CivGroup[civ][0].set_color(GREEN)
+		elif civ.Attitude == 2:
+			self.CivGroup[civ][0].set_color(RED)
+		elif civ.Attitude == 3:
+			self.CivGroup[civ][0].set_color(YELLOW)
 		else:
-			self.CivGroup[self.Universe.New][0].set_color(GREY)
+			self.CivGroup[civ][0].set_color(GREY)
 
-		self.play(FadeIn(self.CivGroup[self.Universe.New][0]))
+		self.play(FadeIn(self.CivGroup[civ][0]))
 		self.wait(0.1)
-		self.play(ApplyMethod(self.CivGroup[self.Universe.New][0].shift, self.Universe.New.transformCoord()), run_time=1)
+		self.play(ApplyMethod(self.CivGroup[civ][0].shift, civ.transformCoord()), run_time=1)
 
-		IR = Ellipse(width=self.Universe.New.IRadius*(6.8/self.Universe.Xsize), height=self.Universe.New.IRadius*(3.886/self.Universe.Ysize), stroke_width=1)
-		self.CivGroup[self.Universe.New].add(IR)
-		IR.move_to(self.Universe.New.transformCoord())
-		if self.Universe.New.Attitude == 1:
-			self.CivGroup[self.Universe.New][1].set_color(GREEN)
-		elif self.Universe.New.Attitude == 2:
-			self.CivGroup[self.Universe.New][1].set_color(RED)
-		elif self.Universe.New.Attitude == 3:
-			self.CivGroup[self.Universe.New][1].set_color(YELLOW)
+		IR = Ellipse(width=civ.IRadius*(6.8/self.Universe.Xsize), height=civ.IRadius*(3.886/self.Universe.Ysize), stroke_width=1)
+		self.CivGroup[civ].add(IR)
+		IR.move_to(civ.transformCoord())
+		if civ.Attitude == 1:
+			self.CivGroup[civ][1].set_color(GREEN)
+		elif civ.Attitude == 2:
+			self.CivGroup[civ][1].set_color(RED)
+		elif civ.Attitude == 3:
+			self.CivGroup[civ][1].set_color(YELLOW)
 		else:
-			self.CivGroup[self.Universe.New][1].set_color(GREY)
+			self.CivGroup[civ][1].set_color(GREY)
 
 		self.play(Create(IR))
 
-		a = self.Universe.New.Name[4:]
+		a = civ.Name[4:]
 		print(a)
 		try:
 			t = Text(a)
 		except Exception:
 			t = Text('No. ????')
 		t.scale(0.2)
-		t.next_to(self.CivGroup[self.Universe.New][0], direction=RIGHT, )
+		t.next_to(self.CivGroup[civ][0], direction=RIGHT, )
 		self.add(t)
-		self.CivLabels[self.Universe.New] = t
+		self.CivLabels[civ] = t
 		self.txts.add(t)
 
 	def drawRelations(self):
