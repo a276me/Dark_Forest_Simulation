@@ -60,6 +60,10 @@ class Galaxy:
 				ret.append(c)
 		return ret
 
+	def getWinner(self):
+		if self.end():
+			return self.Civilizations[0]
+
 	def move(self):
 		self.newCiv()
 		for i in self.Civilizations:
@@ -91,11 +95,3 @@ if __name__ == '__main__':
 			print(i)
 		print('---------------')
 		input()
-
-
-# Humans = Civilization(100,100)
-
-# for i in range(10000):
-# 	Humans.move()
-# 	print(f'Year:{i}; Power:{Humans.Power}; Tech:{Humans.Tech}; attitude:{Humans.Attitude}')
-
